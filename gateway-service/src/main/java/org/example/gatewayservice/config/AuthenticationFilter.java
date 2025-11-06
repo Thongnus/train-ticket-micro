@@ -6,65 +6,71 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
-@RefreshScope
 @Component
-public class AuthenticationFilter implements GatewayFilter {
+@RefreshScope
+public class AuthenticationFilter implements GlobalFilter, Ordered {
 
-    @Autowired
-    private RouterValidator routerValidator;
-    @Autowired
-    private JwtUtil jwtUtil;
+    @Autowired private RouterValidator routerValidator;
+    @Autowired private JwtUtil jwtUtil;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        ServerHttpRequest request = exchange.getRequest();
+        var request = exchange.getRequest();
 
-        if (routerValidator.isSecured.test(request)) {
-            if (this.isAuthMissing(request))
-                return this.onError(exchange, "Authorization header is missing in request", HttpStatus.UNAUTHORIZED);
-
-            final String token = this.getAuthHeader(request);
-
-            if (jwtUtil.validateToken(token))
-                return this.onError(exchange, "Authorization header is invalid", HttpStatus.UNAUTHORIZED);
-
-            this.populateRequestWithHeaders(exchange, token);
+        if (!routerValidator.isSecured.test(request)) {
+            return chain.filter(exchange); // public endpoint
         }
-        return chain.filter(exchange);
-    }
 
+        var auth = request.getHeaders().getFirst("Authorization");
+        if (auth == null || !auth.startsWith("Bearer ")) {
+            return unauthorized(exchange, "Missing or invalid Authorization header");
+        }
 
-    /*PRIVATE*/
+        var token = auth.substring(7).trim(); // cắt "Bearer "
 
-    private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {
-        ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(httpStatus);
-        return response.setComplete();
-    }
+        // nếu jwtUtil.validateToken(token) TRẢ VỀ true = hợp lệ
+        if (!jwtUtil.validateToken(token)) {
+            return unauthorized(exchange, "Invalid token");
+        }
 
-    private String getAuthHeader(ServerHttpRequest request) {
-        return request.getHeaders().getOrEmpty("Authorization").get(0);
-    }
+        Claims claims;
+        try {
+            claims = jwtUtil.getAllClaimsFromToken(token);
+        } catch (Exception e) {
+            return unauthorized(exchange, "Invalid token");
+        }
 
-    private boolean isAuthMissing(ServerHttpRequest request) {
-        return !request.getHeaders().containsKey("Authorization");
-    }
-
-    private void populateRequestWithHeaders(ServerWebExchange exchange, String token) {
-        Claims claims = jwtUtil.getAllClaimsFromToken(token);
-        exchange.getRequest().mutate()
-                .header("id", String.valueOf(claims.get("id")))
-                .header("role", String.valueOf(claims.get("role")))
+        // add header & gắn lại vào exchange
+        var mutatedReq = request.mutate()
+                .header("X-User-Id", String.valueOf(claims.get("id")))
+                .header("X-Role", String.valueOf(claims.get("role")))
                 .build();
+
+        return chain.filter(exchange.mutate().request(mutatedReq).build());
     }
+
+    private Mono<Void> unauthorized(ServerWebExchange exchange, String msg) {
+        var res = exchange.getResponse();
+        res.setStatusCode(HttpStatus.UNAUTHORIZED);
+        return res.setComplete();
+    }
+
+    @Override
+    public int getOrder() {
+        return -1; // chạy sớm
+    }
+
+
 }
+
 /**
  *
  * Đây là một đoạn code để thực hiện xác thực JWT (JSON Web Token) trong Spring Cloud Gateway.
