@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>ServiceDiscovery</artifactId>
+    <artifactId>discovery-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>ServiceDiscovery</name>
     <description>ServiceDiscovery</description>

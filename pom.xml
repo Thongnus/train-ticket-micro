@@ -16,8 +16,9 @@
         <module>notification-service</module>
         <module>promotion-service</module>
         <module>ticketing-service</module>
-        <module>gateway-service</module>       <!-- tên THƯ MỤC thật -->
-        <module>ServiceDiscovery</module>      <!-- kiểm tra thư mục có đúng tên không -->
+        <module>gateway-service</module>
+        <module>common-service</module><!-- tên THƯ MỤC thật -->
+        <module>discovery-service</module>      <!-- kiểm tra thư mục có đúng tên không -->
         <module>payment-service</module>
     </modules>
 
@@ -25,11 +26,17 @@
         <java.version>21</java.version>
         <spring.boot.version>3.3.4</spring.boot.version>
         <spring.cloud.version>2023.0.6</spring.cloud.version>
+        <modelmapper.version>3.1.1</modelmapper.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.modelmapper</groupId>
+                <artifactId>modelmapper</artifactId>
+                <version>${modelmapper.version}</version>
+            </dependency>
             <!-- BOM Boot -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>

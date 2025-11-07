@@ -18,7 +18,8 @@
 
     <properties>
         <java.version>21</java.version>
-        <spring-cloud.version>2023.0.6</spring-cloud.version> <!-- HỢP VỚI Boot 3.3.x -->
+        <spring-cloud.version>2023.0.6</spring-cloud.version>
+            <modelmapper.version>3.1.1</modelmapper.version>
     </properties>
 
     <dependencyManagement>
@@ -39,7 +40,11 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.train.ticket</groupId>
+            <artifactId>common-service</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <!-- WebFlux (thường được kéo transitively; giữ cũng không sao) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

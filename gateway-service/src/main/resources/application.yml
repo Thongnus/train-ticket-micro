@@ -1,68 +1,30 @@
 server:
-  port: 8756
-
+  port: ${api-gateway.port}
 spring:
   application:
     name: gateway-service
   main:
     web-application-type: reactive
+  profiles:
+    active: ${common.env:local}
+  config:
+    import:
+      - optional:classpath:common-service.properties
+
   cloud:
     gateway:
-      # DÙNG KEY CŨ (Cloud 2023):
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
-      routes:
-        - id: user-service
-          uri: lb://user-service
-          predicates:
-            - Path=/api/users/**
-          filters:
-            - StripPrefix=1
-
-        - id: booking-service
-          uri: lb://booking-service
-          predicates:
-            - Path=/api/bookings/**
-          filters:
-            - StripPrefix=1
-
-        - id: payment-service
-          uri: lb://payment-service
-          predicates:
-            - Path=/api/payments/**
-          filters:
-            - StripPrefix=1
-        - id: notification-service
-          uri: lb://notification-service
-          predicates:
-            - Path=/api/notifications/**
-          filters:
-              - StripPrefix=1
-        - id: catalog-service
-          uri: lb://catalog-service
-          predicates:
-            - Path=/api/catalog/**
-          filters:
-              - StripPrefix=1
-        - id: promotion-service
-          uri: lb://promotion-service
-          predicates:
-            - Path=/api/promotions/**
-          filters:
-              - StripPrefix=1
-        - id: ticket-service
-          uri: lb://ticket-service
-          predicates:
-            - Path=/api/tickets/**
-          filters:
-              - StripPrefix=1
 jwt:
   secret: gsdggfsdgddddddddgdsgdghsdrhhshsdghsdsghs
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:9999/eureka/
-    register-with-eureka: true
-    fetch-registry: true
+      defaultZone: http://localhost:9999/eureka

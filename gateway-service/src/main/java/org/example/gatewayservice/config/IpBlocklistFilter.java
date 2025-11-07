@@ -60,5 +60,5 @@ public class IpBlocklistFilter implements GlobalFilter, Ordered {
         return (addr == null || addr.getAddress() == null) ? null : addr.getAddress().getHostAddress();
     }
 
-    @Override public int getOrder() { return -200; } // chạy sớm, trước JWT
+    @Override public int getOrder() { return -200; } // trước JWT
 }
