@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.web.util.matcher.IpAddressMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -11,34 +12,36 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Arrays;
 
 @Component
 public class IpBlocklistFilter implements GlobalFilter, Ordered {
 
-    // ENV ví dụ: GATEWAY_BLOCK_IPS="203.0.113.8,198.51.100.0/24,10.0.0.0/8"
-    private static  List<String> denied = List.of("203.0.113.8,198.51.100.0"); // IPv4 + IPv6 localhost
+    // Ví dụ cấu hình:
+    // GATEWAY_BLOCK_IPS="203.0.113.8,198.51.100.0/24,10.0.0.0/8,::1"
+    private final List<IpAddressMatcher> blockedMatchers;
 
-//    public IpBlocklistFilter(@Value("${GATEWAY_BLOCK_IPS:}") String blocked) {
-//        if (blocked == null || blocked.isBlank()) {
-//            this.BLOCKED_IPS = List.of();
-//        } else {
-//            this.BLOCKED_IPS = Arrays.stream(blocked.split("\\s*,\\s*"))
-//                    .filter(s -> !s.isBlank())
-//                    .map(IpAddressMatcher::new)        // hỗ trợ IP đơn & CIDR
-//                    .toList();
-//        }
-//    }
+    public IpBlocklistFilter(@Value("${GATEWAY_BLOCK_IPS:}") String blocked) {
+        if (blocked == null || blocked.isBlank()) {
+            this.blockedMatchers = List.of();
+        } else {
+            this.blockedMatchers = Arrays.stream(blocked.split("\\s*,\\s*"))
+                    .filter(s -> !s.isBlank())
+                    .map(IpAddressMatcher::new) // hỗ trợ IP đơn & CIDR & IPv6
+                    .collect(Collectors.toUnmodifiableList());
+        }
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        if (denied.isEmpty()) return chain.filter(exchange);
+        if (blockedMatchers.isEmpty()) return chain.filter(exchange);
 
         String clientIp = extractClientIp(exchange);
-        if (clientIp == null) return chain.filter(exchange);
+        if (clientIp == null || clientIp.isBlank()) return chain.filter(exchange);
 
-        boolean blocked = denied.stream().anyMatch(m -> m.matches(clientIp));
+        boolean blocked = blockedMatchers.stream().anyMatch(m -> m.matches(clientIp));
         if (!blocked) return chain.filter(exchange);
 
         var res = exchange.getResponse();
@@ -50,15 +53,21 @@ public class IpBlocklistFilter implements GlobalFilter, Ordered {
     }
 
     private String extractClientIp(ServerWebExchange exchange) {
-        var headers = exchange.getRequest().getHeaders();
-        // Ưu tiên X-Forwarded-For (lấy IP đầu tiên)
+        var req = exchange.getRequest();
+        var headers = req.getHeaders();
+
+        // Ưu tiên X-Real-IP do proxy nội bộ set
+        String ip = headers.getFirst("X-Real-IP");
+        if (ip != null && !ip.isBlank()) return ip.trim();
+
+        // Sau đó tới X-Forwarded-For (lấy IP đầu tiên)
         String xff = headers.getFirst("X-Forwarded-For");
-        if (xff != null && !xff.isBlank()) {
-            return xff.split(",")[0].trim();
-        }
-        var addr = exchange.getRequest().getRemoteAddress();
+        if (xff != null && !xff.isBlank()) return xff.split(",")[0].trim();
+
+        var addr = req.getRemoteAddress();
         return (addr == null || addr.getAddress() == null) ? null : addr.getAddress().getHostAddress();
     }
 
-    @Override public int getOrder() { return -200; } // trước JWT
+    // Chạy rất sớm (trước JWT filter của bạn đang -1)
+    @Override public int getOrder() { return -200; }
 }

@@ -56,4 +56,14 @@ public class JwtUtil {
         return this.isTokenExpired(token);
     }
 
+    public String extractUserNameFromToken(String token){
+        return   Jwts.parserBuilder()
+                .setSigningKey(secret)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+
+
+    }
 }
