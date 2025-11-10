@@ -43,6 +43,7 @@ public class JwtAuthenticationInServiceFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         try {
+            log.debug("--Vao FILTER AUTHENNN------");
             String bearer = req.getHeader("Authorization");
             if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
                 String token = bearer.substring(7).trim();

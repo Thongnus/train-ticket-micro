@@ -1,6 +1,7 @@
 package org.example.gatewayservice.config;
 
 import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 import org.example.gatewayservice.common.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -15,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Component
 @RefreshScope
 public class AuthenticationFilter implements GlobalFilter, Ordered {
@@ -37,7 +39,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
-
+        log.debug("VÀO FILTER GATEWAY--------------------");
         // 0) Whitelist các endpoint public
         if (!routerValidator.isSecured.test(request)) {
             return chain.filter(exchange);

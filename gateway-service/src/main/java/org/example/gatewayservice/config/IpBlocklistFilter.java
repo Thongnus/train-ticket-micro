@@ -1,5 +1,6 @@
 package org.example.gatewayservice.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Arrays;
-
+@Slf4j
 @Component
 public class IpBlocklistFilter implements GlobalFilter, Ordered {
 
@@ -36,6 +37,7 @@ public class IpBlocklistFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        log.debug("VÀO FILTER IP GATEWAY--------------------");
         if (blockedMatchers.isEmpty()) return chain.filter(exchange);
 
         String clientIp = extractClientIp(exchange);
