@@ -28,7 +28,7 @@ jwt:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:9999/eureka
+      defaultZone: ${hostname.local}:${eureka.port}/eureka
 GATEWAY_BLOCK_IPS: "203.0.113.8,198.51.100.0/24,10.0.0.0/8,::1"
 clientService:
   authentication-service-url: http://auth-service:8080
