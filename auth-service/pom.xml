@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>user-service</artifactId>
+    <artifactId>auth-service</artifactId>
     <name>User Service</name>
     <packaging>jar</packaging>
 

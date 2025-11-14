@@ -18,10 +18,15 @@ public class JwtUtil {
     private String secret;
 
     private Key key;
+    @Value("${jwt.access-token-expiration}")
     private static final long EXPIRATION_MS = 10000;
+
+
     @PostConstruct
     public void init(){
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        log.info( generateToken("admin"));
+
     }
     private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
     public Claims getAllClaimsFromToken(String token) {

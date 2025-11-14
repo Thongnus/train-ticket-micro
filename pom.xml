@@ -4,63 +4,101 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>com.train.ticket</groupId>
     <artifactId>train-ticket-parent</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>user-service</module>
+        <module>auth-service</module>
         <module>booking-service</module>
         <module>catalog-service</module>
         <module>notification-service</module>
         <module>promotion-service</module>
         <module>ticketing-service</module>
         <module>gateway-service</module>
-        <module>common-service</module><!-- tên THƯ MỤC thật -->
-        <module>discovery-service</module>      <!-- kiểm tra thư mục có đúng tên không -->
+        <module>common-service</module>
+        <module>discovery-service</module>
         <module>payment-service</module>
     </modules>
 
     <properties>
         <java.version>21</java.version>
-        <spring.boot.version>3.3.4</spring.boot.version>     <!-- hoặc 3.3.6 -->
-        <spring.cloud.version>2023.0.5</spring.cloud.version> <!-- ↓ hạ về .5 -->
+
+        <!-- Các version thư viện -->
+        <jjwt.version>0.11.5</jjwt.version>
+        <lombok.version>1.18.34</lombok.version>
         <modelmapper.version>3.1.1</modelmapper.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <hibernate.validator.version>8.0.1.Final</hibernate.validator.version>
+        <spring-cloud.version>2024.0.2</spring-cloud.version>
     </properties>
 
+    <!-- Dùng dependencyManagement để các module con kế thừa version -->
     <dependencyManagement>
         <dependencies>
+            <!-- BOM của Spring Boot để module con tự nhận version -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>3.4.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- BOM của Spring Cloud -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Các dependency riêng có version khác -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.modelmapper</groupId>
                 <artifactId>modelmapper</artifactId>
                 <version>${modelmapper.version}</version>
             </dependency>
-            <!-- BOM Boot -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <!-- BOM Cloud -->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring.cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
 
-            </dependency>
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-actuator</artifactId>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate.validator.version}</version>
+            </dependency>
+
 
         </dependencies>
     </dependencyManagement>
+
 
     <build>
         <pluginManagement>
@@ -73,6 +111,7 @@
                         <release>${java.version}</release>
                     </configuration>
                 </plugin>
+
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
