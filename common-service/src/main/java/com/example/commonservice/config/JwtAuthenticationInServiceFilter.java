@@ -21,65 +21,66 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Filter “chuẩn” cho mọi microservice:
- * - Đọc Bearer token từ Authorization header
- * - Validate token (chữ ký + hạn)
- * - Trích username/roles/... từ claims
- * - Set Authentication vào SecurityContext
- */
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationInServiceFilter extends OncePerRequestFilter {
 
-    private final TokenProvice tokenProvice;
+    private final TokenProvice tokenProvider;
 
     @Override
     protected void doFilterInternal(
-            @NonNull HttpServletRequest req,
-            @NonNull HttpServletResponse res,
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
             @NonNull FilterChain chain
     ) throws ServletException, IOException {
 
         try {
-            log.debug("--Vao FILTER AUTHENNN------");
-            String bearer = req.getHeader("Authorization");
-            if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
-                String token = bearer.substring(7).trim();
+            String path = request.getRequestURI();
+            log.debug("JWT Filter - Processing: {} {}", request.getMethod(), path);
 
-                if (tokenProvice.validateJwtToken(token)) {
-                    Authentication authentication = tokenProvice.getAuthentication(token);
-                    if(SecurityContextHolder.getContext().getAuthentication() == null)
-                    {
+            String token = extractTokenFromRequest(request);
+
+            if (token != null) {
+                if (tokenProvider.validateJwtToken(token)) {
+                    Authentication authentication = tokenProvider.getAuthentication(token);
+
+                    // 4) Set vào SecurityContext nếu chưa có
+                    if (SecurityContextHolder.getContext().getAuthentication() == null) {
                         SecurityContextHolder.getContext().setAuthentication(authentication);
-                        log.debug("Set authentication for user: {}", authentication.getName());
+                        log.debug("Set authentication for user: {} with authorities: {}",
+                                authentication.getName(),
+                                authentication.getAuthorities());
                     }
-
+                } else {
+                    log.warn("Invalid JWT token for path: {}", path);
+                    SecurityContextHolder.clearContext();
                 }
+            } else {
+                log.debug("No JWT token found in request for path: {}", path);
             }
+
         } catch (Exception ex) {
-            // Không ném ra ngoài để ExceptionTranslationFilter xử lý; có thể log nếu cần
+            // Clear context khi có lỗi
+            log.error("Cannot set user authentication: {}", ex.getMessage());
             SecurityContextHolder.clearContext();
         }
 
-        chain.doFilter(req, res);
-    }
-
-    private List<SimpleGrantedAuthority> parseAuthorities(String rolesStr) {
-        if (!StringUtils.hasText(rolesStr)) return List.of();
-        return Arrays.stream(rolesStr.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .map(this::normalizeRole)
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        // Tiếp tục filter chain
+        chain.doFilter(request, response);
     }
 
     /**
-     * Chuẩn hoá: nếu chưa có prefix ROLE_ thì thêm vào để dùng hasRole/hasAuthority nhất quán
+     * Extract JWT token từ Authorization header
      */
-    private String normalizeRole(String role) {
-        return role.startsWith("ROLE_") ? role : "ROLE_" + role;
+    private String extractTokenFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7).trim();
+        }
+
+        return null;
     }
 }

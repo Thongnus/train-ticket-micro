@@ -1,6 +1,6 @@
 package org.example.userservice.repository;
 
-import com.example.betickettrain.entity.User;
+import org.example.userservice.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,5 +19,7 @@ public interface UserRepository extends JpaRepository<User, Integer> , JpaSpecif
     @Query("SELECT  u FROM User u JOIN u.roles r WHERE r.name = 'ROLE_USER'")
     Page<User> findAllUsersWithRoleUser(Pageable pageable);
     ArrayList<User> findByUsernameContaining(String username);
+
+    User findByUsernameAndToken(String username, String token);
 
 }

@@ -1,9 +1,9 @@
 package org.example.userservice.service;
 
 
-import com.example.betickettrain.dto.SignupRequest;
-import com.example.betickettrain.dto.UserDto;
-import com.example.betickettrain.entity.User;
+import org.example.userservice.dto.UserDto;
+import org.example.userservice.dto.request.SignUpRequest;
+import org.example.userservice.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,11 +12,11 @@ import java.util.ArrayList;
 
 public interface UserService {
     User findbyUsername(String name);
-
+     boolean validateToken(String username, String token);
     User saveTT(User user);
 
     // UserService method
-    UserDto registerUser(SignupRequest signupRequest) throws RoleNotFoundException;
+    UserDto registerUser(SignUpRequest signupRequest) throws RoleNotFoundException;
 
     Page<User> getallUser(Pageable pageable);
 
