@@ -1,6 +1,6 @@
 package org.example.gatewayservice.config;
 
-import com.example.commonservice.config.TokenProvice;
+import com.example.commonservice.config.TokenProvide;
 import com.example.commonservice.entity.ErrorResponse;
 import com.example.commonservice.exceptionHandle.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,7 +44,7 @@ import reactor.core.publisher.Mono;
 public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     private final RouterValidator routerValidator;
-    private final TokenProvice jwtUtil;
+    private final TokenProvide jwtUtil;
     private final WebClient.Builder webClientBuilder;
     private final ObjectMapper objectMapper;
 
@@ -52,7 +52,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private String authServiceUrl;
 
     public AuthenticationFilter(RouterValidator routerValidator,
-                                TokenProvice jwtUtil,
+                                TokenProvide jwtUtil,
                                 WebClient.Builder webClientBuilder) {
         this.routerValidator = routerValidator;
         this.jwtUtil = jwtUtil;
@@ -119,7 +119,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         Mono<Void> validateWithAuthService = webClientBuilder.build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(authServiceUrl + "/api/validate-token")
+                        .path(authServiceUrl + "/api/auth/validate-token")
                         .queryParam("username", username)
                         .build())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)

@@ -4,6 +4,7 @@ import com.example.commonservice.entity.ErrorResponse;
 import com.example.commonservice.entity.FieldError;
 import com.example.commonservice.exceptionHandle.ErrorCode;
 import com.example.commonservice.exceptionHandle.exception.BaseException;
+import com.example.commonservice.exceptionHandle.exception.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -46,7 +47,21 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(ex.getStatus()).body(response);
     }
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(
+            NotFoundException ex,
+            HttpServletRequest request) {
+        log.warn("NotFound exception: {} ", ex.getMessage());
 
+        ErrorResponse response = ErrorResponse.of(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                ErrorCode.RESOURCE_NOT_FOUND.getCode(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
 //    @ExceptionHandler(SeatLockedException.class)
 //    public ResponseEntity<ErrorResponse> handleSeatLockedException(
 //            SeatLockedException ex,

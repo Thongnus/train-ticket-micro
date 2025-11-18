@@ -26,7 +26,7 @@ import java.util.Collection;
 
 @Component
 @Slf4j
-public class TokenProvice {
+public class TokenProvide {
 
     @Value("${jwt.public-key}")
     private Resource publicKeyResource;

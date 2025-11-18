@@ -21,7 +21,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationInServiceFilter extends OncePerRequestFilter {
 
-    private final TokenProvice tokenProvider;
+    private final TokenProvide tokenProvider;
 
     @Override
     protected void doFilterInternal(
@@ -40,13 +40,12 @@ public class JwtAuthenticationInServiceFilter extends OncePerRequestFilter {
                 if (tokenProvider.validateToken(token)) {
                     Authentication authentication = tokenProvider.getAuthentication(token);
 
-                    // 4) Set vào SecurityContext nếu chưa có
-                    if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                        log.debug("Set authentication for user: {} with authorities: {}",
-                                authentication.getName(),
-                                authentication.getAuthorities());
-                    }
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.debug("Set authentication for user: {} with authorities: {}",
+                            authentication.getName(),
+                            authentication.getAuthorities());
+
                 } else {
                     log.warn("Invalid JWT token for path: {}", path);
                     SecurityContextHolder.clearContext();
@@ -61,7 +60,7 @@ public class JwtAuthenticationInServiceFilter extends OncePerRequestFilter {
             SecurityContextHolder.clearContext();
         }
 
-        // Tiếp tục filter chain
+
         chain.doFilter(request, response);
     }
 

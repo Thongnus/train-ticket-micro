@@ -1,13 +1,12 @@
-package org.example.userservice.config;
+package org.example.userservice.security;
 
+import com.example.commonservice.config.AuthEntryPointJwt;
 import com.example.commonservice.config.BaseSecurityConfig;
 import com.example.commonservice.config.JwtAuthenticationInServiceFilter;
-import com.example.commonservice.config.AuthEntryPointJwt;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @Configuration
 @EnableWebSecurity
@@ -21,19 +20,19 @@ public class UserServiceSecurityConfig extends BaseSecurityConfig {
     @Override
     protected void configureAuthorization(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
-
                 .requestMatchers(
-                "/actuator/**",
-                "/v3/api-docs/**",
-                "/swagger-ui/**",
-                "api/auth/**",
-                "/api/public/**"
-            ).permitAll()
+                        "/actuator/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "api/auth/**",
+                        "/api/public/**",
+                        "/swagger-ui.html"
+                ).permitAll()
 
-            .requestMatchers("/api/admin/**").hasRole("ADMIN")
-            .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "STAFF")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "USER")
 
-            .anyRequest().permitAll()
+                .anyRequest().authenticated()
         );
     }
 }

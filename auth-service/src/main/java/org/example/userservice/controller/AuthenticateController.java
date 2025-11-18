@@ -45,5 +45,16 @@ public class AuthenticateController {
 
         }
     }
+    @GetMapping("/validate-token")
+    public ResponseEntity<Boolean> validateToken(@RequestParam String username, @RequestHeader("Authorization") String authorizationHeader) {
+        String token = null;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7);
+        } else {
+            return ResponseEntity.badRequest().body(false);
+        }
+        log.info("Validating token for user: {}", userService.validateToken(username, token));
+        return ResponseEntity.ok().body(userService.validateToken(username, token));
+    }
 
 }

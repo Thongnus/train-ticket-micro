@@ -1,5 +1,6 @@
 package org.example.userservice.service;
 
+import com.example.commonservice.exceptionHandle.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.userservice.dto.UserDTO;
@@ -30,8 +31,8 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    UserMapper userMapper;
-    RoleRepository roleRepository;
+    private final UserMapper userMapper;
+    private final RoleRepository roleRepository;
     @Override
     public User findbyUsername(String name) {
         return null;
@@ -81,13 +82,13 @@ public class UserServiceImpl implements UserService {
         // Default role
         if (requestedRoles == null || requestedRoles.isEmpty()) {
             Role userRole = roleRepository.findByName(Constants.Role.ROLE_USER);
-            if (userRole == null) throw new RoleNotFoundException("Role CUSTOMER not found");
+            if (userRole == null) throw new NotFoundException("Role CUSTOMER not found");
             roles.add(userRole);
         }
         // Admin role if requested
         if (requestedRoles != null && requestedRoles.contains("ADMIN")) {
             Role adminRole = roleRepository.findByName(Constants.Role.ROLE_ADMIN);
-            if (adminRole == null) throw new RoleNotFoundException("Role ADMIN not found");
+            if (adminRole == null) throw new NotFoundException("Role ADMIN not found");
             roles.add(adminRole);
         }
 

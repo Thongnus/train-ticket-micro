@@ -10,7 +10,11 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @SpringBootApplication( exclude = {
         DataSourceAutoConfiguration.class,
         HibernateJpaAutoConfiguration.class,
-        DataSourceTransactionManagerAutoConfiguration.class
+        DataSourceTransactionManagerAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration.class,
+        org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration.class
 },scanBasePackages = {"com.example.commonservice","org.example.gatewayservice"})
 
 @EnableDiscoveryClient

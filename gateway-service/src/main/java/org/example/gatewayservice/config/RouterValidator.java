@@ -13,7 +13,8 @@ public class RouterValidator {
             "/api/public",
             "/auth/register",
             "/auth/login",
-            "swagger-ui"
+            "swagger-ui",
+            "/api/users/ping"
     );
 
     public Predicate<ServerHttpRequest> isSecured =
