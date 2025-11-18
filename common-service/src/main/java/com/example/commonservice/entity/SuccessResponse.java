@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
@@ -21,7 +22,7 @@ public class SuccessResponse<T> {
 
     public static <T> SuccessResponse<T> of(T data) {
         return SuccessResponse.<T>builder()
-                .status(200)
+                .status(HttpStatus.OK.value())
                 .message("SUCCESS")
                 .data(data)
                 .timestamp(LocalDateTime.now())
@@ -30,7 +31,7 @@ public class SuccessResponse<T> {
 
     public static <T> SuccessResponse<T> of(T data, String message) {
         return SuccessResponse.<T>builder()
-                .status(200)
+                .status(HttpStatus.OK.value())
                 .message(message)
                 .data(data)
                 .timestamp(LocalDateTime.now())
@@ -39,7 +40,7 @@ public class SuccessResponse<T> {
 
     public static <T> SuccessResponse<T> created(T data) {
         return SuccessResponse.<T>builder()
-                .status(201)
+                .status(HttpStatus.CREATED.value())
                 .message("Created successfully")
                 .data(data)
                 .timestamp(LocalDateTime.now())
@@ -48,7 +49,7 @@ public class SuccessResponse<T> {
 
     public static <T> SuccessResponse<T> created(T data, String message) {
         return SuccessResponse.<T>builder()
-                .status(201)
+                .status(HttpStatus.CREATED.value())
                 .message(message)
                 .data(data)
                 .timestamp(LocalDateTime.now())

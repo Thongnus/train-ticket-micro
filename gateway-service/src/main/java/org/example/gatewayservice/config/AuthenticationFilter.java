@@ -1,5 +1,6 @@
 package org.example.gatewayservice.config;
 
+import com.example.commonservice.config.TokenProvice;
 import com.example.commonservice.entity.ErrorResponse;
 import com.example.commonservice.exceptionHandle.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -7,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
-import org.example.gatewayservice.common.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -44,7 +44,7 @@ import reactor.core.publisher.Mono;
 public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     private final RouterValidator routerValidator;
-    private final JwtUtil jwtUtil;
+    private final TokenProvice jwtUtil;
     private final WebClient.Builder webClientBuilder;
     private final ObjectMapper objectMapper;
 
@@ -52,7 +52,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private String authServiceUrl;
 
     public AuthenticationFilter(RouterValidator routerValidator,
-                                JwtUtil jwtUtil,
+                                TokenProvice jwtUtil,
                                 WebClient.Builder webClientBuilder) {
         this.routerValidator = routerValidator;
         this.jwtUtil = jwtUtil;

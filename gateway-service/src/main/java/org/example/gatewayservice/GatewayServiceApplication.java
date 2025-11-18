@@ -11,7 +11,8 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
         DataSourceAutoConfiguration.class,
         HibernateJpaAutoConfiguration.class,
         DataSourceTransactionManagerAutoConfiguration.class
-})
+},scanBasePackages = {"com.example.commonservice","org.example.gatewayservice"})
+
 @EnableDiscoveryClient
 public class GatewayServiceApplication {
 

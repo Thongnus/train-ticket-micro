@@ -18,8 +18,8 @@ spring:
           enabled: true
           lower-case-service-id: true
 jwt:
-  secret: ${jwt}
-  access-token-expiration: ${access-token-expiration}
+  public-key: classpath:keys/public_key.pem
+#  access-token-expiration: ${access-token-expiration}
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration

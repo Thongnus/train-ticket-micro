@@ -18,7 +18,7 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto implements Serializable {
+public class UserDTO implements Serializable {
     Long userId;
     String username;
     String password;

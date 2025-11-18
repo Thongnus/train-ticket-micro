@@ -21,18 +21,19 @@ public class UserServiceSecurityConfig extends BaseSecurityConfig {
     @Override
     protected void configureAuthorization(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
-            .requestMatchers(
+
+                .requestMatchers(
                 "/actuator/**",
                 "/v3/api-docs/**",
                 "/swagger-ui/**",
-                "/auth/**",
+                "api/auth/**",
                 "/api/public/**"
             ).permitAll()
 
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "STAFF")
 
-            .anyRequest().authenticated()
+            .anyRequest().permitAll()
         );
     }
 }

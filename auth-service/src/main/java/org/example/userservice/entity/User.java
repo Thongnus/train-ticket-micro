@@ -52,7 +52,7 @@ public class User  implements Serializable {
 //    @Column(nullable = true, unique = true, length = 20)
     private String idCard;
 
-    private LocalDate dateOfBirth;
+    private Instant dateOfBirth;
 
     @ManyToMany(fetch = FetchType.EAGER,cascade =CascadeType.PERSIST)
     @JoinTable(

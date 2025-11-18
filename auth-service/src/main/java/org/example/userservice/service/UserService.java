@@ -1,7 +1,7 @@
 package org.example.userservice.service;
 
 
-import org.example.userservice.dto.UserDto;
+import org.example.userservice.dto.UserDTO;
 import org.example.userservice.dto.request.SignUpRequest;
 import org.example.userservice.entity.User;
 import org.springframework.data.domain.Page;
@@ -16,13 +16,13 @@ public interface UserService {
     User saveTT(User user);
 
     // UserService method
-    UserDto registerUser(SignUpRequest signupRequest) throws RoleNotFoundException;
+    UserDTO registerUser(SignUpRequest signupRequest) throws RoleNotFoundException;
 
     Page<User> getallUser(Pageable pageable);
 
     User updatepassword(User u);
 
-    User update(UserDto user, String username);
+    User update(UserDTO user, String username);
 
     User updatenopassword(User user);
 
@@ -32,10 +32,10 @@ public interface UserService {
 
     ArrayList<User> searchbyName(String name);
 
-    Page<UserDto> findUsers(String search, String role, String status, Pageable pageable);
-    UserDto createUser(UserDto userDto);
+    Page<UserDTO> findUsers(String search, String role, String status, Pageable pageable);
+    UserDTO createUser(UserDTO userDto);
 //    UserDto updateUser(Long id, UserDto userDto);
     void deleteUser(Long id);
-    UserDto toggleStatus(Long id, String status);
-    UserDto findUserById(Long id);
+    UserDTO toggleStatus(Long id, String status);
+    UserDTO findUserById(Long id);
 }
