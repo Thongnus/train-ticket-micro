@@ -15,8 +15,6 @@
         <module>booking-service</module>
         <module>catalog-service</module>
         <module>notification-service</module>
-        <module>promotion-service</module>
-        <module>ticketing-service</module>
         <module>gateway-service</module>
         <module>common-service</module>
         <module>discovery-service</module>

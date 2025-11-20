@@ -150,7 +150,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO findUserById(Long id) {
+    public UserDTO findUserById(Integer id) {
         return null;
     }
 }

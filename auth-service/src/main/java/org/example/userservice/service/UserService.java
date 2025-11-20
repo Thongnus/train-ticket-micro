@@ -37,5 +37,5 @@ public interface UserService {
 //    UserDto updateUser(Long id, UserDto userDto);
     void deleteUser(Long id);
     UserDTO toggleStatus(Long id, String status);
-    UserDTO findUserById(Long id);
+    UserDTO findUserById(Integer id);
 }
